@@ -1,6 +1,6 @@
 # Maku
 
-Simple photoboth application for the web.
+Simple photobooth application for the web.
 
 ## Setup
 
