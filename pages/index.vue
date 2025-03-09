@@ -1,7 +1,7 @@
 <script setup lang="ts">
     useSeoMeta({
-        title: "Maku",
-        ogTitle: "Maku",
+        title: "Mneme",
+        ogTitle: "Mneme",
         description: "Simple photobooth application for the web.",
         ogDescription: "Simple photobooth application for the web.",
         //ogImage: "https://example.com/image.png",
