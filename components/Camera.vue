@@ -1,4 +1,6 @@
 <script setup>
+    import { db } from "../db";
+
     const video = ref(null);
     const snap = ref(null);
     const canvas = ref(null);
@@ -32,6 +34,9 @@
         if (context && video.value) {
             context.drawImage(video.value, 0, 0, 600, 400);
         }
+
+        // uuid
+        blob = canvas.value.toDataURL("image/png");
     };
 
     onMounted(() => {
