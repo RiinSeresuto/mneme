@@ -100,7 +100,9 @@
             <img :src="img.blob" height="100%" width="100%" />
         </div>
 
-        <div class="thumbnail">Gallery</div>
+        <NuxtLink class="nav-link" to="/gallery">
+            <div class="thumbnail">Gallery</div>
+        </NuxtLink>
     </div>
 
     <canvas

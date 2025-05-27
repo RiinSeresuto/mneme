@@ -1,6 +1,7 @@
 <template>
     <ul>
         <li><NuxtLink class="nav-link" to="/">Home</NuxtLink></li>
+        <li><NuxtLink class="nav-link" to="/gallery">Gallery</NuxtLink></li>
         <li><NuxtLink class="nav-link" to="/about">About</NuxtLink></li>
         <li>
             <NuxtLink class="nav-link" to="/privacy-policy">
