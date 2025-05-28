@@ -3,9 +3,22 @@
 
     const thumbnailsrc = ref([]);
     const imageview = ref([]);
+    const dialog = ref(null);
+
+    const showModal = () => {
+        dialog.value.showModal();
+    };
+
+    const closeModal = () => {
+        dialog.value.close();
+
+        imageview.value = [];
+    };
 
     const viewImage = async (id) => {
         imageview.value = await db.images.get(id);
+
+        showModal();
     };
 
     const fetchImages = async () => {
@@ -41,6 +54,11 @@
             <img :src="img.blob" height="100%" width="100%" />
         </div>
     </div>
+
+    <dialog ref="dialog">
+        <button @click="closeModal()">Close</button>
+        <img :src="imageview.blob" />
+    </dialog>
 </template>
 
 <style scoped>
@@ -55,5 +73,28 @@
         display: block;
 
         background-color: red;
+        cursor: pointer;
+        box-shadow: black 1px 1px;
+    }
+
+    dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        border: none;
+        border-radius: 4px;
+    }
+
+    dialog::backdrop {
+        background-image: linear-gradient(
+            45deg,
+            magenta,
+            rebeccapurple,
+            dodgerblue,
+            green
+        );
+        opacity: 0.5;
     }
 </style>
