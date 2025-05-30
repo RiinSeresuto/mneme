@@ -4,6 +4,7 @@
     const id = parseInt(route.params.id);
 
     const selectedImage = ref([]);
+    const imageCount = ref(0);
 
     if (!validTemplatesId.includes(id)) {
         throw createError({
@@ -11,16 +12,6 @@
             statusMessage: "Template Not Found",
         });
     }
-
-    const addImage = (image) => {
-        console.log("Received in parent:", image);
-
-        if (!selectedImage.value.some((img) => img.id === image.id)) {
-            selectedImage.value.push(image);
-        }
-
-        console.log("New array:", selectedImage);
-    };
 
     switch (id) {
         case 1:
@@ -30,16 +21,24 @@
         case 8:
         case 9:
         case 10:
-            var imageCount = 3;
+            imageCount.value = 3;
             break;
         case 4:
         case 5:
         case 11:
-            var imageCount = 4;
+            imageCount.value = 4;
             break;
         case 7:
-            var imageCount = 2;
+            imageCount.value = 2;
     }
+
+    const addImage = (image) => {
+        if (!selectedImage.value.some((img) => img.id === image.id)) {
+            if (selectedImage.value.length < imageCount.value) {
+                selectedImage.value.push(image);
+            }
+        }
+    };
 </script>
 
 <template>
@@ -55,13 +54,10 @@
         </div>
         <div id="previewCol">
             <div v-if="id == 1">
-                You've Chosen Template 1
-
-                <TemplatesTemplate1 />
-
-                <div v-for="img in selectedImage">
-                    <img :src="img.blob" alt="" />
-                </div>
+                <TemplatesTemplate1
+                    :imageCount="imageCount"
+                    :selectedImage="selectedImage"
+                />
             </div>
             <div v-else-if="id == 2">You've Chose Template 2</div>
         </div>
@@ -71,7 +67,7 @@
 <style scope>
     #sections {
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: var(--space-m);
     }
 </style>

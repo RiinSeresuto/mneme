@@ -18,7 +18,6 @@
     });
 
     const selectImage = (img) => {
-        console.log("Emitting image:", img);
         emit("image-selected", img);
     };
 
