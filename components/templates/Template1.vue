@@ -1,11 +1,13 @@
 <script setup>
-    const canvas = ref(null);
+    const canvasPreview = ref(null);
     const frameTemplate = ref(null);
-    const ctx = ref(null);
+    const ctxPreview = ref(null);
 
-    const DPI = 300;
-    const widthInInches = 2;
-    const heightInInches = 6;
+    const positions = [
+        { x: 19.45, y: 36.52, width: 160 },
+        { x: 19.45, y: 174.52, width: 160 },
+        { x: 19.45, y: 312.52, width: 160 },
+    ];
 
     const props = defineProps({
         imageCount: {
@@ -17,55 +19,89 @@
         },
     });
 
-    const placeImge = (blob, x, y, width, height) => {
+    const placeImge = (src, x, y, width) => {
         const img = new Image();
-        const url = URL.createObjectURL(blob);
 
         img.onload = () => {
-            ctx.value.drawImage(img, x, y, width, height);
+            const aspectRatio = img.height / img.width;
+            const height = width * aspectRatio;
 
-            URL.revokeObjectURL(url);
+            ctxPreview.value.drawImage(img, x, y, width, height);
+
+            if (frameTemplate.value.complete) {
+                ctxPreview.value.drawImage(
+                    frameTemplate.value,
+                    0,
+                    0,
+                    canvasPreview.value.width,
+                    canvasPreview.value.height
+                );
+            } else {
+                frameTemplate.value.onload = () => {
+                    ctxPreview.value.drawImage(
+                        frameTemplate.value,
+                        0,
+                        0,
+                        canvasPreview.value.width,
+                        canvasPreview.value.height
+                    );
+                };
+            }
         };
+
+        img.src = src;
+
+        console.log(x, y);
     };
 
     onMounted(() => {
-        if (canvas.value) {
-            ctx.value = canvas.value.getContext("2d");
-
-            canvas.value.width = widthInInches * DPI;
-            canvas.value.height = heightInInches * DPI;
+        if (canvasPreview.value) {
+            ctxPreview.value = canvasPreview.value.getContext("2d");
         }
     });
 
     watch(props.selectedImage, () => {
-        console.log(props.selectedImage);
+        ctxPreview.value.clearRect(
+            0,
+            0,
+            canvasPreview.value.width,
+            canvasPreview.value.height
+        );
+
+        props.selectedImage.forEach((image, index) => {
+            placeImge(
+                image.blob,
+                positions[index].x,
+                positions[index].y,
+                positions[index].width,
+                positions[index].height
+            );
+        });
     });
 
     const getCoordinate = (event) => {
-        const rect = canvas.value.getBoundingClientRect();
+        const rect = canvasPreview.value.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
         console.log("Coordinates ==>", x, y);
     };
-
-    const canvasBoxStyle = computed(() => ({
-        "--width": `${widthInInches * DPI}px`,
-        "--height": `${heightInInches * DPI}px`,
-    }));
 </script>
 
 <template>
-    Choose only {{ props.imageCount }} images from the selection
+    <p>Choose only {{ props.imageCount }} images from the selection</p>
 
-    <!-- <div v-for="img in props.selectedImage">
-        <img :src="img.blob" alt="" />
-    </div> -->
+    <div class="canvas--containier">
+        <div class="canvas--box">
+            <canvas
+                ref="canvasPreview"
+                @click="getCoordinate"
+                width="200"
+                height="600"
+            ></canvas>
 
-    <div class="canvas--box" :style="canvasBoxStyle">
-        <canvas ref="canvas" @click="getCoordinate"></canvas>
-
-        <img ref="frameTemplate" src="/img/Option-01.png" />
+            <img ref="frameTemplate" src="/img/Option-01.png" />
+        </div>
     </div>
 </template>
 
@@ -73,10 +109,23 @@
     :root {
         --scale: 0.65;
         --transform-origin: top left;
+
+        --width: 200px;
+        --height: 600px;
     }
 
     template {
         width: 100%;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    .canvas--containier {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .canvas--box {
@@ -84,8 +133,6 @@
         display: block;
         width: var(--width);
         height: var(--height);
-        transform: scale(var(--scale));
-        transform-origin: var(--transform-origin);
     }
 
     .canvas--box canvas {
@@ -93,17 +140,15 @@
         display: block;
         top: 0;
         left: 0;
-        transform: scale(var(--scale));
-        transform-origin: var(--transform-origin);
+        width: var(--width);
+        height: var(--height);
     }
 
     .canvas--box img {
-        /* display: none; */
+        display: none;
         position: absolute;
         top: 0;
         left: 0;
         pointer-events: none;
-        transform: scale(var(--scale));
-        transform-origin: var(--transform-origin);
     }
 </style>
